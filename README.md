@@ -65,10 +65,11 @@ Pass `--help` for further information on the flags.
 ## Results
 Running against link-tree
 ![test1](docs/test1.png)
+
 Running against Google
 ![test2](docs/test2.png)
 
-After testing several popular sites against link-tree powered by cloudflare, it is very performant, even beating out google. Each site was tested with 10 requests. Measurements are in milliseconds.
+After testing several popular sites against link-tree powered by cloudflare, it is clear cloudflare workers are very performant - even beating out google. Each site was tested with 10 requests. Measurements are in milliseconds.
 
 | site      | fastest | slowest | mean  | median |
 |-----------|---------|---------|-------|--------|
