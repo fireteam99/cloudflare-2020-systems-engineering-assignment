@@ -32,15 +32,9 @@ func main() {
 		return
 	}
 
-	//fmt.Println("url:", *urlPtr)
-	//fmt.Println("profile:", *profilePtr)
-
 	// validate the url
 	parsedURL, err := url.ParseRequestURI(*urlPtr)
 	checkError(err)
-
-	//fmt.Println("hostname:", parsedURL.Host)
-	//fmt.Println("path:", parsedURL.Path)
 
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", parsedURL.Host + ":80")
 	checkError(err)
@@ -56,7 +50,12 @@ func main() {
 		conn, err := net.DialTCP("tcp", nil, tcpAddr)
 		checkError(err)
 
-		req := fmt.Sprintf("GET %s HTTP/1.0\r\nHost: %s\r\n\r\n", parsedURL.Path, parsedURL.Host)
+		path := parsedURL.Path
+		if len(path) == 0 {
+			path = "/"
+		}
+
+		req := fmt.Sprintf("GET %s HTTP/1.0\r\nHost: %s\r\n\r\n", path, parsedURL.Host)
 		_, err = conn.Write([]byte(req))
 		checkError(err)
 
@@ -78,7 +77,6 @@ func main() {
 			runes := []rune(statusLine)
 			offset := utf8.RuneCountInString(parsedStatusLine[0]) + utf8.RuneCountInString(parsedStatusLine[1]) + 1
 			statusMessage := strings.TrimSpace(string(runes[offset:]))
-			fmt.Println("status message:",  statusMessage)
 
 			codeInt, err := strconv.Atoi(code)
 			checkError(err)
@@ -108,8 +106,6 @@ func main() {
 			break
 		}
 	}
-	//fmt.Printf("%v\n", times)
-	//fmt.Printf("%v\n", sizes)
 
 	fmt.Println("Requests made:", *profilePtr)
 	printTimes(times)
@@ -191,9 +187,10 @@ func printErrors(m map[string]int, attempts int) {
 	if len(m) > 0 {
 		fmt.Println("Errors:")
 		for k, v := range m {
-			fmt.Printf("%s x %d\n", k, v)
+			fmt.Printf("  - %s x %d\n", k, v)
 		}
 	}
+
 	percentage := fmt.Sprintf("%.2f%%", (float64(attempts) - float64(errorCount)) / float64(attempts) * float64(100))
 	fmt.Println("Success Rate:", percentage)
 }
